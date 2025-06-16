@@ -7,45 +7,45 @@ import { Pokemon } from '../types/Pokemon';
 import { PokemonCard } from '../components/PokemonCard';
 
 export const PokedexScreen = () => {
-const [pokemons, setPokemons] = useState<Pokemon[]>([]);
-const [search, setSearch] = useState('');
-const [isLoading, setIsLoading] = useState(true);
-const [error, setError] = useState('');
-const [offset, setOffset] = useState(0);
-const [loadingMore, setLoadingMore] = useState(false);
+  const [pokemons, setPokemons] = useState<Pokemon[]>([]);
+  const [search, setSearch] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [offset, setOffset] = useState(0);
+  const [loadingMore, setLoadingMore] = useState(false);
 
   useEffect(() => {
-  const fetchData = async () => {
+    const fetchData = async () => {
+      try {
+        setIsLoading(true);
+        const list = await getPokemons(30, 0);
+        const details = await Promise.all(list.map(p => getPokemonDetails(p.url)));
+        setPokemons(details);
+        setOffset(30);
+      } catch (err) {
+        setError('Falha ao carregar Pokémons. Verifique sua conexão.');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
+
+  const loadMorePokemons = async () => {
+    if (loadingMore || isLoading || search) return;
+
+    setLoadingMore(true);
     try {
-      setIsLoading(true);
-      const list = await getPokemons(30, 0);
+      const list = await getPokemons(30, offset);
       const details = await Promise.all(list.map(p => getPokemonDetails(p.url)));
-      setPokemons(details);
-      setOffset(30);
+      setPokemons(prev => [...prev, ...details]);
+      setOffset(prev => prev + 30);
     } catch (err) {
-      setError('Falha ao carregar Pokémons. Verifique sua conexão.');
+      console.error('Erro ao carregar mais pokémons', err);
     } finally {
-      setIsLoading(false);
+      setLoadingMore(false);
     }
   };
-  fetchData();
-}, []);
-
-const loadMorePokemons = async () => {
-  if (loadingMore || isLoading || search) return; 
-
-  setLoadingMore(true);
-  try {
-    const list = await getPokemons(30, offset);
-    const details = await Promise.all(list.map(p => getPokemonDetails(p.url)));
-    setPokemons(prev => [...prev, ...details]);
-    setOffset(prev => prev + 30);
-  } catch (err) {
-    console.error('Erro ao carregar mais pokémons', err);
-  } finally {
-    setLoadingMore(false);
-  }
-};
 
 
   const filtered = pokemons.filter(p => p.name.includes(search.toLowerCase()));
@@ -68,40 +68,40 @@ const loadMorePokemons = async () => {
   }
 
   return (
-  <View style={styles.container}>
-    <Text style={styles.title}>Pokédex</Text>
-    <TextInput
-      placeholder="Buscar pokémon..."
-      style={styles.input}
-      onChangeText={setSearch}
-      value={search}
-    />
+    <View style={styles.container}>
+      <Text style={styles.title}>Pokédex</Text>
+      <TextInput
+        placeholder="Buscar pokémon..."
+        style={styles.input}
+        onChangeText={setSearch}
+        value={search}
+      />
 
-    <FlatList
-      data={filtered}
-      keyExtractor={item => item.id.toString()}
-      numColumns={2}
-      renderItem={({ item }) => <PokemonCard pokemon={item} />}
-      contentContainerStyle={styles.list}
-      onEndReached={loadMorePokemons}
-      onEndReachedThreshold={0.5}
-      ListFooterComponent={
-        loadingMore ? (
-          <Text style={styles.loadingMore}>Carregando mais Pokémons...</Text>
-        ) : null
-      }
-      ListEmptyComponent={
-        <View style={styles.centered}>
-          <Text style={styles.message}>
-            {search
-              ? `Nenhum pokémon encontrado para "${search}".`
-              : 'Nenhum pokémon disponível.'}
-          </Text>
-        </View>
-      }
-    />
-  </View>
-);
+      <FlatList
+        data={filtered}
+        keyExtractor={item => item.id.toString()}
+        numColumns={2}
+        renderItem={({ item }) => <PokemonCard pokemon={item} />}
+        contentContainerStyle={styles.list}
+        onEndReached={loadMorePokemons}
+        onEndReachedThreshold={0.5}
+        ListFooterComponent={
+          loadingMore ? (
+            <Text style={styles.loadingMore}>Carregando mais Pokémons...</Text>
+          ) : null
+        }
+        ListEmptyComponent={
+          <View style={styles.centered}>
+            <Text style={styles.message}>
+              {search
+                ? `Nenhum pokémon encontrado para "${search}".`
+                : 'Nenhum pokémon disponível.'}
+            </Text>
+          </View>
+        }
+      />
+    </View>
+  );
 };
 
 const styles = StyleSheet.create({
@@ -124,7 +124,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     fontSize: 16,
     marginBottom: 16,
-    elevation: 2, 
+    elevation: 2,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
@@ -142,20 +142,20 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   message: {
-  fontSize: 16,
-  textAlign: 'center',
-  padding: 20,
-  color: '#666',
-},
-list: {
-  paddingBottom: 40,
-},
-loadingMore: {
-  paddingVertical: 20,
-  textAlign: 'center',
-  color: '#888',
-},
-empty: {
+    fontSize: 16,
+    textAlign: 'center',
+    padding: 20,
+    color: '#666',
+  },
+  list: {
+    paddingBottom: 40,
+  },
+  loadingMore: {
+    paddingVertical: 20,
+    textAlign: 'center',
+    color: '#888',
+  },
+  empty: {
     fontSize: 16,
     textAlign: 'center',
     marginTop: 40,
