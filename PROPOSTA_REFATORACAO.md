@@ -5,26 +5,26 @@ Escolhi o padrão **MVVM** (Model-View-ViewModel) por ser muito adequado para Re
 Ele facilita o reaproveitamento da lógica, melhora a testabilidade e mantém a View (tela) limpa e focada apenas na UI.
 
 ## Nova Estrutura de Arquivos
+```txt
 PokedexApp/
 ├─ screens/
-│ └─ Pokedex/
-│ ├─ PokedexScreen.tsx (View)
-│ ├─ usePokedexViewModel.ts (ViewModel)
-│ └─ PokemonDetails/
-│ ├─ PokemonDetailsScreen.tsx (View)
-│ ├─ usePokemonDetailsViewModel.ts (ViewModel)
+│  └─ Pokedex/
+│     ├─ PokedexScreen.tsx              (View)
+│     ├─ usePokedexViewModel.ts         (ViewModel)
+│     └─ PokemonDetails/
+│        ├─ PokemonDetailsScreen.tsx    (View)
+│        ├─ usePokemonDetailsViewModel.ts (ViewModel)
 ├─ components/
-│ ├─ PokemonCard.tsx
-│ ├─ PokemonTypesList.tsx
-│ ├─ PokemonHeader.tsx
+│  ├─ PokemonCard.tsx
+│  ├─ PokemonTypesList.tsx
+│  ├─ PokemonHeader.tsx
 ├─ services/
-│ └─ api.ts
+│  └─ api.ts
 ├─ types/
-│ ├─ Navigation.ts
-│ └─ Pokemon.ts
+│  ├─ Navigation.ts
+│  └─ Pokemon.ts
 ├─ utils/
-│ └─ format.ts
-
+│  └─ format.ts
 
 ## Divisão de Responsabilidades
 ### View (`PokedexScreen.tsx`)
