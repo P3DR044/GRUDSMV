@@ -25,6 +25,7 @@ PokedexApp/
 │  └─ Pokemon.ts
 ├─ utils/
 │  └─ format.ts
+```
 
 ## Divisão de Responsabilidades
 ### View (`PokedexScreen.tsx`)
